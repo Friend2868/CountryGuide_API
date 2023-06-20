@@ -276,7 +276,7 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 
 > | data type      | type         | format                  | description                                                   |
 > |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | Serie          | Requestbody  | object (JSON or YAML)   | N/A  |
+> | Country        | Requestbody  | object (JSON or YAML)   | N/A  |
 
 
 ##### Responses
@@ -312,7 +312,7 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 
 > | data type      | type         | format                  | description                                                   |
 > |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | {Name} des angeforderten Landes  |
+> | String         | Pathvariable | String   		    | {Name} des angeforderten Landes  |
 
 
 ##### Responses
@@ -320,24 +320,6 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 > |content-type             | response example / description                                                                |
 > |-------------------------|-----------------------------------------------------------------------------------------------|
 > |`json string`       | `JSON Country-Objekt`                                              |
-
-
-</details>
-<details>
- <summary><code>GET</code> <code><b>/addCountry</b></code> <code>(Fügt ein Country-Objekt zur Datenbank hinzu)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | None          | -  | -   | N/A  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON String-Liste an Seriennamen`                                              |
 
 
 </details>
@@ -367,7 +349,7 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 > | data type      | type         | format                  | description                                                   |
 > |----------------|--------------|-------------------------|---------------------------------------------------------------|
 > | String          | Path  | String   | {countryname} des gewünschten Landes  |
-> | Rennen | Requestbody | object (JSON or YAML) | N/A |   
+> | Country | Requestbody | object (JSON or YAML) | N/A |   
 
 </details>
 
