@@ -5,20 +5,19 @@ Meine Idee war eine API, mit welcher man über den Website-Client ganz einfach v
 
 ## Inhaltsverzeichnis
 - [Softwaredesign](#softwaredesign)
-- [Beschreibung Software](#beschreibung-der-software)
-- [API Beschreibung](#api-beschreibung)
-- [Diagramme](#diagramme)
+- [Beschreibung von wichtigen Softwareabschnitten](#beschreibung-von-wichtigen-softwareabschnitten)
+- [API-Endpoint-Beschreibung](#api-endpoint-beschreibung)
+- [Klassendiagramm](#klassendiagramm)
 - [Diskussion](#diskussion)
 
 <br>
 
 ## Softwaredesign
-
 ```mermaid
 graph LR
 A(Website) -- displays Data --> C
 B(WPF-Anwendung) -- changes data --> C
-C(RaceresultAPI) -- receives/sends data --> D
+C(Countrycontroller) -- receives/sends data --> D
 D(MongoDB)
 ```
 
@@ -31,8 +30,8 @@ Die Website dient als einfache Benutzeroberfläche, auf welcher die Nutzer ganz 
 #### WPF Anwendung
 Die WPF Anwendung dient als "Adminprogramm" der CountryGuide-API. Über die WPF Anwendung können alle Daten einfach hinzugefügt, geändert, oder auch gelöscht werden.
 
-## Beschreibung der Software
-#### CountryGuide-API
+## Beschreibung von wichtigen Softwareabschnitten
+#### API/Server
 Für den Server und die API wurden folgende Dependencies verwendet:
 
 ```xml 
@@ -172,41 +171,106 @@ Wie man sehen kann, wird sich zuerst vom Textfeld der Name des gewünschten Land
 #### WPF Anwendung
 Da die WPF Anwendung, gleich wie die Blazor WebApp, in C# implementiert wurde ist der Code, welcher für die Interaktion mit der RaceresultAPI zuständig ist, sehr ähnlich zu dem der Blazor WebApp. Lediglich die Codeteile, welche die Darstellung der Daten vornehmen unterscheidet sich. 
 
-##### POST-Request 
-Im nachfolgendem Codeabschnitt ist die Implementierung eines POST-Requests dargestellt.
+##### POST
+Im nachfolgendem Codeabschnitt ist die Implementierung des POST-Requests, um Objektdaten an den Server zu schicken und ein neues Objekt zu speichern, dargestellt.
 ```c#
- JObject json = new JObject
+try
 {
-	{ "name", addName },
-	{ "punkteSystem", punkteSys }
-};
+	string[] common_languages = CommonLanguagesTextBox.Text.Split(',');
 
-HttpContent content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+	Country country = new Country
+	{
+		Countryname = CountryTextBox.Text,
+		Capital = CapitalTextBox.Text,
+		Continent = ContinentTextBox.Text,
+		Population = Int32.Parse(PopulationTextBox.Text),
+		Currency = CurrencyTextBox.Text,
+		Common_languages = common_languages,
+		Imagesource = ImagesourceTextBox.Text
+	};
 
-Task<string> response = new HttpClient().PostAsync(apiURL + "/addSeries", content).Result.Content.ReadAsStringAsync();
+	string jsonString = JsonConvert.SerializeObject(country);
+
+	using (HttpClient client = new HttpClient())
+	{
+		HttpResponseMessage response = await client.PostAsJsonAsync(ApiUrl + "/addCountry", country);
+		response.EnsureSuccessStatusCode();
+
+		MessageBox.Show("Data sent successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+	}
+}
+catch (Exception ex)
+{
+	MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+}
 ```
-In diesem Fall wird der Endpoint <code>/addSeries</code> verwendet, um eine neue Rennserie hinzuzufügen.
+Hier wird der Endpoint <code>/addCountry</code> verwendet, um ein neues Country-Objekt in die Datenbank einzufügen.
 
-##### PUT-Request
-Im nachfolgendem Codeabschnitt ist die Implementierung eines PUT-Requests dargestellt.
+##### PUT
+Im nachfolgendem Codeabschnitt ist die Implementierung eines PUT-Requests, um Objektdaten an den Server zu schicken und ein Element zu ersetzen, dargestellt.
 ```c#
-Task<string> response = new HttpClient().PutAsync(url + "/" + name + "/updateDriver", content).Result.Content.ReadAsStringAsync();
-```
-In diesem Fall wird der Endpoint <code>/{Serie}/updateDriver</code> verwendet, um die Daten eines Fahrers zu ändern.
+try
+{
+	using (HttpClient client = new HttpClient())
+	{
+		string[] common_languages = CommonLanguagesTextBox.Text.Split(',');
 
-##### DELETE-Request
-Im nachfolgendem Codeabschnitt ist die Implementierung eines DELETE-Requests dargestellt.
+		Country country = new Country
+		{
+			Countryname = CountryTextBox.Text,
+			Capital = CapitalTextBox.Text,
+			Continent = ContinentTextBox.Text,
+			Population = Int32.Parse(PopulationTextBox.Text),
+			Currency = CurrencyTextBox.Text,
+			Common_languages = common_languages,
+			Imagesource = ImagesourceTextBox.Text
+		};
+
+		string jsonString = JsonConvert.SerializeObject(country);
+
+		string updateEndpoint = "/updateCountry/" + CountryTextBox.Text;
+
+		HttpResponseMessage response = await client.PutAsJsonAsync(ApiUrl + updateEndpoint, country);
+		response.EnsureSuccessStatusCode();
+
+		MessageBox.Show("Data sent successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+	}
+}
+catch (Exception ex)
+{
+	MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+}
+```
+Hier wird der Endpoint <code>/updateCountry/{countryname}</code> verwendet, um die Daten eines Landes zu ändern.
+
+##### DELETE
+Im nachfolgendem Codeabschnitt ist die Implementierung eines DELETE-Requests, um bestimmte Daten vom Server zu löschen, dargestellt.
 ```c#
-Task<string> response = new HttpClient().DeleteAsync(apiURL + "/" + selectSeries.Text + "/delete").Result.Content.ReadAsStringAsync();
+try
+{
+	string countryName = CountrynameTextBox.Text;
+
+	using (HttpClient client = new HttpClient())
+	{
+		HttpResponseMessage response = await client.DeleteAsync(ApiUrl + "/deleteCountry/" + countryName);
+		response.EnsureSuccessStatusCode();
+
+		MessageBox.Show("Country name sent successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+	}
+}
+catch (Exception ex)
+{
+	MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+}
 
 ```
-In diesem Fall wird der Endpoint <code>/{Name}/delete</code> verwendet, um eine Rennserie zu löschen.
+Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um ein Land aus der Datenbank zu löschen.
 
-## API Beschreibung
+## API-Endpoint-Beschreibung
 
-### Rennserie
+### Country
 <details>
- <summary><code>POST</code> <code><b>/addSeries</b></code> <code>(Fügt eine Serie hinzu)</code></summary>
+ <summary><code>POST</code> <code><b>/addCountry/{countryname}</b></code> <code>(Fügt ein Land hinzu)</code></summary>
 
 ##### Parameters
 
@@ -224,7 +288,7 @@ In diesem Fall wird der Endpoint <code>/{Name}/delete</code> verwendet, um eine 
 
 </details>
 <details>
- <summary><code>GET</code> <code><b>/getSeries</b></code> <code>(Gibt alle Serien zurück)</code></summary>
+ <summary><code>GET</code> <code><b>/getcountries</b></code> <code>(Gibt alle Länder zurück)</code></summary>
 
 ##### Parameters
 
@@ -237,30 +301,30 @@ In diesem Fall wird der Endpoint <code>/{Name}/delete</code> verwendet, um eine 
 
 > |content-type             | response example / description                                                                |
 > |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Liste an Serien`                                              |
+> |`json string`       | `JSON Länderliste`                                              |
 
 
 </details>
 <details>
- <summary><code>GET</code> <code><b>/{Name}</b></code> <code>(Gibt eine Serie zurück)</code></summary>
+ <summary><code>GET</code> <code><b>/getcountry/{countryname}</b></code> <code>(Gibt ein Land zurück)</code></summary>
 
 ##### Parameters
 
 > | data type      | type         | format                  | description                                                   |
 > |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | {Name} der gewünschten Serie  |
+> | String          | Path  | String   | {Name} des angeforderten Landes  |
 
 
 ##### Responses
 
 > |content-type             | response example / description                                                                |
 > |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Objekt der Serie`                                              |
+> |`json string`       | `JSON Country-Objekt`                                              |
 
 
 </details>
 <details>
- <summary><code>GET</code> <code><b>/getSeriesNames</b></code> <code>(Gibt die Namen aller Serien zurück)</code></summary>
+ <summary><code>GET</code> <code><b>/addCountry</b></code> <code>(Fügt ein Country-Objekt zur Datenbank hinzu)</code></summary>
 
 ##### Parameters
 
@@ -278,13 +342,13 @@ In diesem Fall wird der Endpoint <code>/{Name}/delete</code> verwendet, um eine 
 
 </details>
 <details>
- <summary><code>DELETE</code> <code><b>/{Name}/delete</b></code> <code>(Löscht eine Serie)</code></summary>
+ <summary><code>DELETE</code> <code><b>/deleteCountry/{countryname}</b></code> <code>(Löscht ein Land)</code></summary>
 
 ##### Parameters
 
 > | data type      | type         | format                  | description                                                   |
 > |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | {Name} der gewünschten Serie  |
+> | String          | Path  | String   | {countryname} des zu löschenden Landes  |
 
 
 ##### Responses
@@ -296,239 +360,18 @@ In diesem Fall wird der Endpoint <code>/{Name}/delete</code> verwendet, um eine 
 
 </details>
 <details>
- <summary><code>GET</code> <code><b>/{Serie}/getStandings</b></code> <code>(Gibt den Gesamtstand einer Serie zurück)</code></summary>
+ <summary><code>PUT</code> <code><b>/updateCountry/{countryname}</b></code> <code>(Updatet ein Land)</code></summary>
 
 ##### Parameters
 
 > | data type      | type         | format                  | description                                                   |
 > |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Integer-Hashmap des aktuellen Gesamtstands`                                              |
-
-  
-</details>
-<details>
- <summary><code>GET</code> <code><b>/{Serie}/getPunkteSystem</b></code> <code>(Gibt das Punktesystem einer Serie zurück)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Integer-List des Punktesystems`                                              |
-
-  
-</details>
-
-### Rennen
-<details>
- <summary><code>POST</code> <code><b>/{Serie}/addResult</b></code> <code>(Fügt ein Rennen zu einer Serie hinzu)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
+> | String          | Path  | String   | {countryname} des gewünschten Landes  |
 > | Rennen | Requestbody | object (JSON or YAML) | N/A |   
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Success Message"}`                                              |
-
-
-</details>
-<details>
-
- <summary><code>GET</code> <code><b>/{Serie}/getResults</b></code> <code>(Gibt alle Rennen einer Serie zurück)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Liste an Rennen`                                              |
-
-  
-</details>
-<details>
- <summary><code>GET</code> <code><b>/{Serie}/getResult/{id}</b></code> <code>(Gibt ein Rennen einer Serie zurück)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | String          | Path  | String   | {id} des gewünschten Rennens  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Objekt des gewünschten Rennens`                                              |
-
-  
-</details>
-<details>
- <summary><code>PUT</code> <code><b>/{Serie}/updateResult</b></code> <code>(Updatet ein Rennen einer Serie)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | Rennen | Requestbody | object (JSON or YAML) | N/A |   
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Success Message"}`                                              |
-
-  
-</details>
-<details>
- <summary><code>DELETE</code> <code><b>/{Serie}/deleteResult/{id}</b></code> <code>(Löscht ein Rennen einer Serie)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | String          | Path  | String   | {id} des gewünschten Rennens  |
-
-  
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Success Message"}`                                              |
-
-
-</details>
-
-### Drivers
-<details>
- <summary><code>POST</code> <code><b>/{Serie}/addDriver</b></code> <code>(Fügt einen Fahrer zu einer Serie hinzu)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | Driver | Requestbody | object (JSON or YAML) | N/A |   
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Success Message"}`                                              |
-
-  
-</details>
-<details>
- <summary><code>GET</code> <code><b>/{Serie}/getDrivers</b></code> <code>(Gibt alle Fahrer einer Serie zurück)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Liste an Fahrern`                                              |
-
-  
-  
-</details>
-<details>
- <summary><code>GET</code> <code><b>/{Serie}/getDriver/{Nr}</b></code> <code>(Gibt einen Fahrer einer Serie zurück)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | String          | Path  | String   | {id} des gewünschten Fahrers  |
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `JSON Objekt des gewünschten Fahrers`                                              |
-
-  
-</details>
-<details>
- <summary><code>PUT</code> <code><b>/{Serie}/updateDriver</b></code> <code>(Updatet einen Fahrer einer Serie)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | Driver | Requestbody | object (JSON or YAML) | N/A |   
-
-
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Success Message"}`                                              |
-
-  
-</details>
-<details>
- <summary><code>DELETE</code> <code><b>/{Serie}/deleteDriver/{Nr}</b></code> <code>(Löscht einen Fahrer einer Serie)</code></summary>
-
-##### Parameters
-
-> | data type      | type         | format                  | description                                                   |
-> |----------------|--------------|-------------------------|---------------------------------------------------------------|
-> | String          | Path  | String   | Name der gewünschten {Serie}  |
-> | String          | Path  | String   | {id} des gewünschten Fahrers  |
-
-  
-##### Responses
-
-> |content-type             | response example / description                                                                |
-> |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Success Message"}`                                              |
-
-
-</details>
 
 ### Verwaltung 
 <details>
- <summary><code>GET</code> <code><b>/state</b></code> <code>(Gibt den Status der API zurück)</code></summary>
+ <summary><code>GET</code> <code><b>/actuator/health</b></code> <code>(Gibt den Status der API zurück)</code></summary>
 
 ##### Parameters
 
@@ -541,169 +384,51 @@ In diesem Fall wird der Endpoint <code>/{Name}/delete</code> verwendet, um eine 
 
 > |content-type             | response example / description                                                                |
 > |-------------------------|-----------------------------------------------------------------------------------------------|
-> |`json string`       | `{"success":"true","message":"Das Service ist verfügbar!"}`  |
+> |`json string`       | `{"success":"true","message":"UP", "success":"false","message":"DOWN"}`  |
 
   
 </details>
 
 ### Datentypen
 <details>
-<summary><code><b>Serie</b></code><code>(Abbildung einer Rennserie)</code></summary>
+<summary><code><b>Rennen</b></code><code>(Abbildung einer Country)</code></summary>
 
 
 ##### Membervariablen
 > | Datentyp | Name | Beschreibung | Required |
 > |----------------|--------------|-----------------------|--------------|
-> | String          | id  | uniqe, auto generated   | no  |
-> | String          | name  | N/A   | yes  |
-> | List (Rennen)          | rennenList  | N/A   | no  |
-> | List (Integer)          | punkteSystem  | N/A   | yes  |
-> | List (Driver)          | fahrerfeld  | N/A   | no  |
-> | Hashmap (Integer, Integer)          | gesamtWertung  | N/A   | no  |
+> | String          | countryname  | Databasekey   | yes  |
+> | String          | capital  | N/A   | yes  |
+> | String          | continent  | N/A   | yes  |
+> | Integer          | population  | N/A   | yes  |
+> | String          | currency  | N/A   | yes  |
+> | List (String)          | common_languages  | N/A   | yes  |
+> | String          | imagesource  | N/A   | yes  |
 
-##### Example JSON POST
-``` json
-{
-    "name": "WRC",
-    "punkteSystem": [
-        25,
-        18,
-        15,
-        12,
-        10,
-        8,
-        6,
-        4,
-        2,
-        1
-    ]
-}
-```
-
-
-</details>
-<details>
-<summary><code><b>Rennen</b></code><code>(Abbildung eines Rennens)</code></summary>
-
-
-##### Membervariablen
-> | Datentyp | Name | Beschreibung | Required |
-> |----------------|--------------|-----------------------|--------------|
-> | String          | id  | uniqe, auto generated   | yes  |
-> | String          | name  | N/A   | yes  |
-> | String          | ort  | N/A   | yes  |
-> | List (Integer)          | ergebnis  | N/A   | yes  |
-
-##### Example JSON POST
-```json
-{
-    "name":"Rally Monte Carlo",
-    "ort":"Monto Carlo",
-    "ergebnis":[
-        11,
-        22,
-        33,
-        44,
-        55,
-        66,
-        77,
-        88,
-        99
-    ]
-}
-```
-
-##### Example JSON PUT
-```json
-{
-	"id":"d4d472b0-5a87-40e6-89ff-1541f7c75048",
-    "name":"Rally Monte Carlo",
-    "ort":"Monto Carlo",
-    "ergebnis":[
-        11,
-        22,
-        33,
-        44,
-        55,
-        66,
-        77,
-        88,
-        99
-    ]
-}
-```
-
-</details>
-<details>
-<summary><code><b>Driver</b></code><code>(Abbildung eines Fahrer)</code></summary>
-
-
-##### Membervariablen
-> | Datentyp | Name | Beschreibung | Required |
-> |----------------|--------------|-----------------------|--------------|
-> | Integer          | number  | N/A | yes  |
-> | String          | name  | N/A | yes  |
-> | String          | team  | N/A   | yes  |
-
-##### Example JSON POST
-```json
-{
-    "number":33,
-    "name":"VITUS",
-    "team":"BMW"
-}
-```
-
-##### Example JSON PUT
-```json
-{
-    "number":33,
-    "name":"VITUS",
-    "team":"BMW"
-}
-```
-
-</details>
-
-## Diagramme
-Das folgende UML-Klassendiagramm zeigt die Beziehungen und Eigenschaften der Datentypen, mit welchen die RaceresultAPI arbeitet.
+## Klassendiagramm
+Das folgende UML-Klassendiagramm zeigt die Eigenschaften der Klasse Country.
 ```mermaid
 classDiagram
 
-Serie "1" *-- "**" Rennen : has
-Serie "1" *-- "*" Driver: has
-
-class  Serie{
-	+id : String
-	+name : String
-	+rennenList : List<Rennen>
-	+punkteSystem : List<Integer>
-	+fahrerfeld : List<Driver>
-	+gesamtWertung : HashMap<Integer, Integer>
-}
-
-class  Rennen{
-	+id : String
-	+name : String
-	+ort : String
-	+ergebnis : List<Integer>
-}
-
-class  Driver{
-	+number : int
-	+name : String
-	+team : String
+class  Country{
+	+countryname : String
+	+capital : String
+	+continent : String
+	+population : int
+	+currency : String
+	+common_languages : List<String>
+	+imagesource : String
 }
 ```
 
 ## Diskussion
-Der Endstand des Projektes kann in 3 einzelne Programme aufgeteilt werden, welche gemeinsam ein komplettes System darstellen. Die RaceresultAPI ist eine einfache REST-API, welche Daten über und um Rennserien verwaltet und speichert. Die Speicherung erfolgt dabei mit einer MongoDB Datenbank. Die WPF Anwendung dient als Verwaltungssoftware und ermöglicht es Daten einfach und übersichtlich an die RaceresultAPI zu schicken oder bearbeiten. Das Ziel der WebApp hingegen ist es die Daten der RaceresultAPI schön darzustellen und sollte hauptsächlich als Informationsquelle für interessierte Fans fungieren.
+Der Endstand des Projektes kann sind 3 Programme. Ein Server welcher die Daten speichert und verwaltet, ein Client für "normale" Benutzer, um Daten aus dem Server abzurufen und anzuzeigen und ein Adminclient, mit dem die Datenbank verändert werden kann. Die CountryGuide-API ist eine einfache REST-API, welche Daten über Länder verwaltet und speichert. Die Speicherung erfolgt dabei mit einer MongoDB Datenbank.
 
-Die Erarbeitung dieses Projektes verlief im großen betrachtet sehr gut. Die Implementierung der REST-API in Spring war dabei der einfachste Teil, da ich mit damit vor dem Projekt schon am meisten Erfahrung hatte. Die Arbeit um die WPF Anwendung war hingegen etwas schwerer, da ich mit WPF bis zu diesem Projekt nur wenig Erfahrung beziehungsweise Berührungspunkte hatte. Durch Recherche im Internet waren allerdings alle Probleme relativ leicht zu lösen. Blazor hingegen war für mich komplettes Neuland und somit auch Anfangs sehr undurchsichtig und verwirrend. Auch hier fand ich allerdings eine Lösung für alle meine Probleme im Internet. Nach dem erarbeiten des Projektes kann ich Blazor allerdings nur jedem empfehlen, da es mit diesem Framework sehr einfach und schnell möglich ist funktionale und optisch ansprechende Websiten zu erstellen. Ein netter Bonuspunkt ist dabei die komplette Meidung von JavaScript. In meinem Fall ist C# viel öfters arbeite und dadurch auch schneller arbeiten kann als in JavaScript
+Die Erarbeitung meines Projektes verlief im Wesentlichen sehr gut. Die Implementierung der REST-API in Spring war dabei der einfachste Teil, da wir damit vor dem Projekt schon am meisten Erfahrung hatte. Die Arbeit um die WPF Anwendung war hingegen etwas schwerer, da ich mit WPF bis zu diesem Projekt nur wenig Erfahrung beziehungsweise Berührungspunkte hatte. Durch Recherche im Internet waren allerdings alle Probleme relativ leicht zu lösen. Auch HTML, CSS und Javascript waren mir natürlich bekannt, allerdings war es anfangs schwer ohne assistierendem Framework daraus etwas ansprechendes zu machen. Auch hier fand ich allerdings eine Lösung für alle meine Probleme im Internet.
 
 ### Mögliche Erweiterungen
-#### Erweiterung der Fahrerteams
-Eine mögliche Erweiterung wäre die Implementierung der Fahrerteams. Zum jetzigen Stand sind die Teams nur als String im Fahrer abgebildet und haben eigentlich keine weitere Funktion. Hier wäre es noch möglich eine Teamwertung, wie es auch aus zahlreichen Autorennserien bekannt sein sollte, zu implementieren.
+#### Erweiterung der Informationen pro Land
+Eine mögliche Erweiterung wäre die Implementierung von mehr verschiedenen nützlichen Informationen über die Länder, wie zum Beispiel lokale Gerichte oder ähnliches. Dies sollte einfach möglich sein, da man eigentlich nur am Country-Objekt weitere Attribute hinzufügen müsste.
 
 #### Darstellung
-Die Darstellung auf der WebApp könnte mithilfe von Bildern oder Icons noch verschönert und ansprechender gemacht werden. So könnte man bei den einzelnen Fahrern ein Portrait anzeigen und somit eine engere Verbindung mit den wirklichen Personen 
+Die Darstellung auf der WebApp könnte noch feingeschliffen werden. Eventuell noch einen Header oder Footer hinzufügen auf dem Informationen angezeigt werden. Auch die WPF-App kann von der Darstellung her noch verbessert werden.
