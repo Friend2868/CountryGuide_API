@@ -5,16 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Country Guide App</title>
+    <link rel="icon" type="image/x-icon" href="/Icon.png">
     <link href = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap"
     rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="heading">
+        <h1>Countryguide</h1>
+    </div>
     <div class="container">
         <div class="search-wrapper">
             <input type="text" id="country-inp" placeholder="Enter a country name here..."/>
-            <button id="search-btn">Search</button>
+            <button onclick="getCountryByName()" id="search-btn">Search</button>
         </div>
         <div id="result"></div>
         <br>

@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Optional;
 @RestController
 public class CountryController {
-        @RequestMapping("/")
-        public String serviceTest(){
-            return "Das Service funktioniert!";
-        }
         @Autowired
         private CountryService countryService;
 
@@ -33,7 +29,14 @@ public class CountryController {
             return response;
         }
 
-        @DeleteMapping("/deleteRezept/{rezeptname}")
+        @RequestMapping(method=RequestMethod.PUT, value="/updateCountry/{countryname}")
+        public String updateCountry(@RequestBody Country country, @PathVariable String countryname) {
+            countryService.updateCountry(country, countryname);
+            String response = "{\"success\": true, \"message\": Country was updated successfully.}";
+            return response;
+        }
+
+        @DeleteMapping("/deleteCountry/{countryname}")
         public String deleteCountry(@PathVariable String countryname) {
             countryService.deleteCountry(countryname);
             String response = "{\"success\": true, \"message\": Country was deleted successfully.}";

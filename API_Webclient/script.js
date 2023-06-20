@@ -5,12 +5,47 @@ let searchAllWrapper = document.getElementById("search-all-wrapper");
 let searchAllContent = document.getElementById("search-all-content");
 let open = false;
 
-searchBtn.addEventListener("click", () => {
-    let countryName = countryInp.value;
+searchAllBtn.addEventListener("click", () => {
+        if(open === false){
+            let finalURL = `http://localhost:3001/getcountries`;
+    
+            fetch(finalURL).then((response) => response.json()).then((data) => {
+                data.sort(function(a, b){
+                    var nameA = a.countryname.toLowerCase(), nameB = b.countryname.toLowerCase();
+                    if (nameA < nameB)
+                     return -1;
+                    if (nameA > nameB)
+                     return 1;
+                    return 0; 
+                   });
+                let fullHTML = "";
+                for (i = 0; i < data.length; i++) {
+                    fullHTML += "<button onclick=\"getCountry('" + data[i].countryname + "');\">" + data[i].countryname + "</button>\n<br>";
+                } 
+                console.log(fullHTML);
+                searchAllBtn.textContent = "Hide Available";
+                searchAllContent.innerHTML += "<br>" + fullHTML;
+            })
+            open = true;
+        }
+        else{
+            searchAllBtn.textContent = "Available Countries";
+            searchAllContent.innerHTML = " ";
+            open = false;
+        }
+});
+function getCountryByName () {
+    getCountry(countryInp.value);
+}
+function getCountry (countryInp) {
+    let countryName = countryInp;
     let finalURL = `http://localhost:3001/getcountry/${countryName}`;
     console.log(finalURL);
+
     fetch(finalURL).then((response) => response.json()).then((data) => {
-        console.log(data.imagesource);
+        var cpopulation = (data.population).toLocaleString(
+            undefined, { minimumFractionDigits: 0 }
+          );
 
         result.innerHTML = `
             <img src="${data.imagesource}" class="flag-img">
@@ -30,7 +65,7 @@ searchBtn.addEventListener("click", () => {
             <div class="wrapper">
                 <div class="data-wrapper">
                     <h4>Population:</h4>
-                    <span>${data.population}</span>
+                    <span>${cpopulation}</span>
                 </div>
             </div>
             <div class="wrapper">
@@ -47,26 +82,4 @@ searchBtn.addEventListener("click", () => {
             </div>
         `;
     })
-});
-searchAllBtn.addEventListener("click", () => {
-        console.log("log");
-        if(open === false){
-            let finalURL = `http://localhost:3001/getcountries`;
-    
-            fetch(finalURL).then((response) => response.json()).then((data) => {
-                console.log(data);
-                let fullHTML = "";
-                for (i = 0; i < data.length; i++) {
-                    fullHTML += "<span>" + data[i].countryname + "</span>\n<br>";
-                } 
-                searchAllBtn.textContent = "Hide Available";
-                searchAllContent.innerHTML += "<br>" + fullHTML;
-            })
-            open = true;
-        }
-        else{
-            searchAllBtn.textContent = "Available Countries";
-            searchAllContent.innerHTML = " ";
-            open = false;
-        }
-});
+} 

@@ -23,8 +23,8 @@ public class CountryService {
         this.countryRepository.save(country);
     }
 
-    public void updateRezept(String id, Country country) {
-        this.countryRepository.deleteByCountryname(country.getCountryname());
+    public void updateCountry(Country country, String countryname) {
+        this.countryRepository.deleteByCountryname(countryname);
         this.countryRepository.save(country);
     }
 

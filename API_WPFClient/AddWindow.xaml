@@ -1,0 +1,69 @@
+﻿<Window x:Class="API_WPFClient.AddWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:API_WPFClient"
+        mc:Ignorable="d"
+        Title="AddWindow" Height="450" Width="800"
+        Icon="Icon.png">
+    <Window.Resources>
+        <Style x:Key="RoundButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="#FF3D64E6"
+                                BorderThickness="0"
+                                CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" FontSize="32" Content="Add a Country:" HorizontalAlignment="Left" Margin="289,15,0,5" Grid.ColumnSpan="2" />
+
+        <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Countryname:" />
+        <TextBox Grid.Row="1" Grid.Column="1" FontSize="18" x:Name="CountryTextBox" Margin="75, 5" />
+
+        <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Capital:" />
+        <TextBox Grid.Row="2" Grid.Column="1" FontSize="18" x:Name="CapitalTextBox" Margin="75, 5" />
+
+        <Label Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Continent:" />
+        <TextBox Grid.Row="3" Grid.Column="1" FontSize="18" x:Name="ContinentTextBox" Margin="75, 5" />
+
+        <Label Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Population:" />
+        <TextBox Grid.Row="4" Grid.Column="1" FontSize="18" x:Name="PopulationTextBox" Margin="75, 5" />
+
+        <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Currency:" />
+        <TextBox Grid.Row="5" Grid.Column="1" FontSize="18" x:Name="CurrencyTextBox" Margin="75, 5" />
+
+        <Label Grid.Row="6" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Common Languages:" />
+        <TextBox Grid.Row="6" Grid.Column="1" FontSize="18" x:Name="CommonLanguagesTextBox" Margin="75, 5" />
+
+        <Label Grid.Row="7" Grid.Column="0" HorizontalAlignment="Center" FontSize="18" Content="Imagelink:" />
+        <TextBox Grid.Row="7" Grid.Column="1" FontSize="18" x:Name="ImagesourceTextBox" Margin="75, 5" />
+
+        <Button Grid.Row="8" FontSize="18" Style="{StaticResource RoundButtonStyle}" Content="Add Country" Click="SendDataButton_Click" HorizontalAlignment="Left" Margin="340,5,0,5" Background="#FF3D64E6" Foreground="White" Height="30" Width="120" Grid.ColumnSpan="2" />
+    </Grid>
+</Window>
