@@ -369,6 +369,8 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 > | String          | Path  | String   | {countryname} des gewünschten Landes  |
 > | Rennen | Requestbody | object (JSON or YAML) | N/A |   
 
+</details>
+
 ### Verwaltung 
 <details>
  <summary><code>GET</code> <code><b>/actuator/health</b></code> <code>(Gibt den Status der API zurück)</code></summary>
@@ -391,7 +393,7 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 
 ### Datentypen
 <details>
-<summary><code><b>Rennen</b></code><code>(Abbildung einer Country)</code></summary>
+<summary><code><b>Country</b></code><code>(Abbildung einer Country)</code></summary>
 
 
 ##### Membervariablen
@@ -404,6 +406,8 @@ Hier wird der Endpoint <code>/deleteCountry/{countryname}</code> verwendet, um e
 > | String          | currency  | N/A   | yes  |
 > | List (String)          | common_languages  | N/A   | yes  |
 > | String          | imagesource  | N/A   | yes  |
+
+</details>
 
 ## Klassendiagramm
 Das folgende UML-Klassendiagramm zeigt die Eigenschaften der Klasse Country.
