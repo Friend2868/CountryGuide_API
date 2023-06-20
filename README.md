@@ -420,6 +420,9 @@ Eine mögliche Erweiterung wäre die Implementierung von mehr verschiedenen nüt
 #### Darstellung
 Die Darstellung auf der WebApp könnte noch feingeschliffen werden. Eventuell noch einen Header oder Footer hinzufügen auf dem Informationen angezeigt werden. Auch die WPF-App kann von der Darstellung her noch verbessert werden.
 
+#### Serveradresse selbst eingeben
+Die Serveradresse könnte vom Benutzer selbt festgelegt werden. Damit könnte man den Server dann auch auf einem anderen Gerät hosten.
+
 ## Quellen
 - [JS-fetch()-Methode Doku](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
 - [WPF Doku](https://wpf-tutorial.com)
