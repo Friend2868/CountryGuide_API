@@ -9,6 +9,7 @@ Meine Idee war eine API, mit welcher man über den Website-Client ganz einfach v
 - [API-Endpoint-Beschreibung](#api-endpoint-beschreibung)
 - [Klassendiagramm](#klassendiagramm)
 - [Diskussion](#diskussion)
+- [Quellen](#quellen)
 
 <br>
 
@@ -418,3 +419,10 @@ Eine mögliche Erweiterung wäre die Implementierung von mehr verschiedenen nüt
 
 #### Darstellung
 Die Darstellung auf der WebApp könnte noch feingeschliffen werden. Eventuell noch einen Header oder Footer hinzufügen auf dem Informationen angezeigt werden. Auch die WPF-App kann von der Darstellung her noch verbessert werden.
+
+## Quellen
+- [JS-fetch()-Methode Doku](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+- [WPF Doku](https://wpf-tutorial.com)
+- [CrossOrigin aktivieren](https://spring.io/guides/gs/rest-service-cors/)
+- [WPF Button-Design](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/controls/button-styles-and-templates?view=netframeworkdesktop-4.8)
+- [Spring-Boot Actuator](https://www.javatpoint.com/spring-boot-actuator#:~:text=Spring%20Boot%20Actuator%20is%20a,place%20where%20the%20resources%20live).)
